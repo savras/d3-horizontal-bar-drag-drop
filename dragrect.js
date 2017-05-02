@@ -6,16 +6,24 @@ var w = 750,
 var isXChecked = true,
     isYChecked = false;
 
-// engagementLevel
-var elwidth = 350,
-    elheight = 40,
-    eldragbarw = 10;
+/**
+ * Drag objects
+ */
+// back reactangle (rectangle with lower z-index)
+var brwidth = 350,
+    brheight = 40,
+    brdragbarw = 10;
 
-var eldrag = d3.drag()
+var brdrag = d3.drag()
     .subject(Object)
-    .on("drag", eldragmove);
+    .on("drag", brdragmove);
 
-// rectangle
+var brdragright = d3.drag()
+    .subject(Object)
+    .on("drag", brrdragresize);
+
+// rectangle (rectangle with higher z-index) a.k.a.
+// rectangle in front overlaying the back rectangle.
 var width = 300,
     height = 30,
     dragbarw = 10;
@@ -40,28 +48,41 @@ var dragbottom = d3.drag()
     .subject(Object)
     .on("drag", bdragresize);
 
+/**
+ * SVG shapes
+ */
 var svg = d3.select("body").append("svg")
     .attr("width", w)
     .attr("height", h)
 
-
-var elg = svg.append("g")
+var brg = svg.append("g")
     .data([{x: width / 2, y: height / 2}]);
 
 var newg = svg.append("g")
       .data([{x: width / 2, y: height / 2}]);
 
-// engagement level
-var eldragrect = elg.append("rect")
+// back rectangle
+var brdragrect = brg.append("rect")
     .attr("id", "engagementLevelRect")
     .attr("x", function(d) { return d.x - 10; })
     .attr("y", function(d) { return d.y - 5; })
-    .attr("height", elheight)
-    .attr("width", elwidth)
+    .attr("height", brheight)
+    .attr("width", brwidth)
     .attr("fill", "orange")
     .attr("fill-opacity", .8)
     .attr("cursor", "move")
-    .call(eldrag);
+    .call(brdrag);
+
+var brdragbarright = brg.append("rect")
+      .attr("x", function(d) { return d.x + brwidth - (brdragbarw * 1.5); })
+      .attr("y", function(d) { return d.y; })
+      .attr("id", "brdragright")
+      .attr("height", brheight - brdragbarw)
+      .attr("width", brdragbarw)
+      .attr("fill", "blue")
+      .attr("fill-opacity", .8)
+      .attr("cursor", "ew-resize")
+      .call(brdragright);
 
 // rectangle
 var dragrect = newg.append("rect")
@@ -71,7 +92,7 @@ var dragrect = newg.append("rect")
       .attr("height", height)
       .attr("width", width)
       .attr("fill", "seagreen")
-      .attr("fill-opacity", 85)
+      .attr("fill-opacity", 0.8)
       .attr("cursor", "move")
       .call(drag);
 
@@ -81,8 +102,8 @@ var dragbarleft = newg.append("rect")
       .attr("height", height - dragbarw)
       .attr("id", "dragleft")
       .attr("width", dragbarw)
-      .attr("fill", "lightblue")
-      .attr("fill-opacity", .5)
+      .attr("fill", "purple")
+      .attr("fill-opacity", .8)
       .attr("cursor", "ew-resize")
       .call(dragleft);
 
@@ -92,8 +113,8 @@ var dragbarright = newg.append("rect")
       .attr("id", "dragright")
       .attr("height", height - dragbarw)
       .attr("width", dragbarw)
-      .attr("fill", "lightblue")
-      .attr("fill-opacity", .5)
+      .attr("fill", "purple")
+      .attr("fill-opacity", .8)
       .attr("cursor", "ew-resize")
       .call(dragright);
 
@@ -120,13 +141,38 @@ var dragbarbottom = newg.append("rect")
       .attr("cursor", "ns-resize")
       .call(dragbottom);
 
-function eldragmove(d) {
+/**
+ * drag behaviours
+ */
+// back rectangle
+function brdragmove(d) {
   if (isXChecked) {
-      eldragrect
-          .attr("x", d.x = Math.max(0, Math.min(w - elwidth, d3.event.x)))
+      brdragrect
+          .attr("x", d.x = Math.max(0, Math.min(w - brwidth, d3.event.x)))
   }
 }
 
+function brrdragresize(d) {
+   if (isXChecked) {
+     //Max x on the left is x - width 
+     //Max x on the right is width of screen + (dragbarw/2)
+     var dragx = Math.max(d.x + (brdragbarw/2), Math.min(w, d.x + brwidth + d3.event.dx));
+
+     //recalculate width
+     brwidth = dragx - d.x;
+
+     //move the right drag handle
+     brdragbarright
+        .attr("x", function(d) { return dragx - (brdragbarw * 1.5) });
+
+     //resize the drag rectangle
+     //as we are only resizing from the right, the x coordinate does not need to change
+     brdragrect
+        .attr("width", brwidth);     
+  }
+}
+
+// rectangle
 function dragmove(d) {
   if (isXChecked) {
       dragrect
