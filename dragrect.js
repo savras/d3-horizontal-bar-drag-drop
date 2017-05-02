@@ -9,18 +9,18 @@ var isXChecked = true,
 // data driven
 var data = [
     {
-        xStart: 20,
-        xEnd: 320,
+        xStart: 200,
+        xEnd: 530,
         yStart: 20,
         yEnd: 50,
-        brXStart: 70,
-        brXEnd: 520,
+        brXStart: 150,
+        brXEnd: 600,
         brYStart: 15,
         brYEnd: 55,
         
         // back rectangle cannot be dragged past obstacle rectangle
-        obsXStart: 100,
-        obsXEnd: 150,
+        obsXStart: 290,
+        obsXEnd: 330,
         obsYStart: 15,
         obsYEnd: 55
     }
@@ -87,7 +87,7 @@ var newg = svg.append("g")
       .data([{x: ((width/2) + (brwidth - width)/2), y: (height/2) + (brheight - height)/2}]);
 
 var staticg = svg.append("g")
-      .data([{x: width + width/4, y: height / 2}]);
+      .data([{x: data[0].obsXStart, y: data[0].obsYStart}]);
 
 // obstacle rectangle
 var obsrect = staticg.append("rect")
@@ -193,6 +193,21 @@ var dragbarbottom = newg.append("rect")
 /**
  * drag behaviours
  */
+function hasCollidedWithObstacle(oldx, currentDragXPos) {
+    var stopDrag = false;
+    var isCursorLeftOfObstable = oldx <= data[0].obsXStart;
+    var isCursorRightOfObstable = oldx >= data[0].obsXEnd;
+    
+    if(isCursorLeftOfObstable && currentDragXPos >= data[0].obsXStart) {
+        return stopDrag = true;
+    }
+    
+    if(isCursorRightOfObstable && currentDragXPos <= data[0].obsXEnd) {
+        return stopDrag = true;
+    }
+    return stopDrag;
+}
+
 // back rectangle
 function brdragmove(d) {
       brdragrect
@@ -207,6 +222,7 @@ function brdragmove(d) {
 
 function brldragresize(d) {
     var oldx = d.x; 
+    
     //Max x on the right is x + width - dragbarw
     //Max x on the left is 0 - (dragbarw/2)
     d.x = Math.max(0, Math.min(d.x + brwidth - (brdragbarw / 2), d3.event.x)); 
@@ -267,51 +283,59 @@ function dragmove(d) {
   }
 }
 
-function ldragresize(d) {
-   if (isXChecked) {
-      var oldx = d.x; 
-     //Max x on the right is x + width - dragbarw
-     //Max x on the left is 0 - (dragbarw/2)
-      d.x = Math.max(0, Math.min(d.x + width - (dragbarw / 2), d3.event.x)); 
-      width = width + (oldx - d.x);
-      dragbarleft
+function ldragresize(d) {   
+    var oldx = d.x; 
+
+    if(hasCollidedWithObstacle(oldx, d3.event.x)) {
+        return;
+    }    
+
+    //Max x on the right is x + width - dragbarw
+    //Max x on the left is 0 - (dragbarw/2)
+    d.x = Math.max(0, Math.min(d.x + width - (dragbarw / 2), d3.event.x)); 
+    width = width + (oldx - d.x);
+    
+    dragbarleft
         .attr("x", function(d) { return d.x - (dragbarw / 2); });
-       
-      dragrect
+
+    dragrect
         .attr("x", function(d) { return d.x; })
         .attr("width", width);
 
-     dragbartop 
+    dragbartop 
         .attr("x", function(d) { return d.x + (dragbarw/2); })
         .attr("width", width - dragbarw)
-     dragbarbottom 
+    
+    dragbarbottom 
         .attr("x", function(d) { return d.x + (dragbarw/2); })
-        .attr("width", width - dragbarw)
-  }
+        .attr("width", width - dragbarw)  
 }
 
 function rdragresize(d) {
-   if (isXChecked) {
-     //Max x on the left is x - width 
-     //Max x on the right is width of screen + (dragbarw/2)
-     var dragx = Math.max(d.x + (dragbarw/2), Math.min(w, d.x + width + d3.event.dx));
+    var currentHandleXPosition = this.getBoundingClientRect().left;
+    if(hasCollidedWithObstacle(currentHandleXPosition, d3.event.x + d.x)) {
+        return;
+    }
+    
+    //Max x on the left is x - width 
+    //Max x on the right is width of screen + (dragbarw/2)
+    var dragx = Math.max(d.x + (dragbarw/2), Math.min(w, d.x + width + d3.event.dx));
 
-     //recalculate width
-     width = dragx - d.x;
+    //recalculate width
+    width = dragx - d.x;
 
-     //move the right drag handle
-     dragbarright
+    //move the right drag handle
+    dragbarright
         .attr("x", function(d) { return dragx - (dragbarw/2) });
 
-     //resize the drag rectangle
-     //as we are only resizing from the right, the x coordinate does not need to change
-     dragrect
+    //resize the drag rectangle
+    //as we are only resizing from the right, the x coordinate does not need to change
+    dragrect
         .attr("width", width);
-     dragbartop 
+    dragbartop 
         .attr("width", width - dragbarw)
-     dragbarbottom 
+    dragbarbottom 
         .attr("width", width - dragbarw)
-  }
 }
 
 function tdragresize(d) {
