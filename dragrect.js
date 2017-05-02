@@ -10,7 +10,7 @@ var isXChecked = true,
  * Drag objects
  */
 // back reactangle (rectangle with lower z-index)
-var brwidth = 350,
+var brwidth = 450,
     brheight = 40,
     brdragbarw = 10;
 
@@ -21,6 +21,11 @@ var brdrag = d3.drag()
 var brdragright = d3.drag()
     .subject(Object)
     .on("drag", brrdragresize);
+
+var brdragleft = d3.drag()
+    .subject(Object)
+    .on("drag", brldragresize);
+
 
 // rectangle (rectangle with higher z-index) a.k.a.
 // rectangle in front overlaying the back rectangle.
@@ -59,13 +64,13 @@ var brg = svg.append("g")
     .data([{x: width / 2, y: height / 2}]);
 
 var newg = svg.append("g")
-      .data([{x: width / 2, y: height / 2}]);
+      .data([{x: ((width/2) + (brwidth - width)/2), y: (height/2) + (brheight - height)/2}]);
 
 // back rectangle
 var brdragrect = brg.append("rect")
     .attr("id", "engagementLevelRect")
-    .attr("x", function(d) { return d.x - 10; })
-    .attr("y", function(d) { return d.y - 5; })
+    .attr("x", function(d) { return d.x; })
+    .attr("y", function(d) { return d.y; })
     .attr("height", brheight)
     .attr("width", brwidth)
     .attr("fill", "orange")
@@ -74,8 +79,8 @@ var brdragrect = brg.append("rect")
     .call(brdrag);
 
 var brdragbarright = brg.append("rect")
-      .attr("x", function(d) { return d.x + brwidth - (brdragbarw * 1.5); })
-      .attr("y", function(d) { return d.y; })
+      .attr("x", function(d) { return d.x + brwidth - (brdragbarw / 2); })
+      .attr("y", function(d) { return d.y + (dragbarw/2); })
       .attr("id", "brdragright")
       .attr("height", brheight - brdragbarw)
       .attr("width", brdragbarw)
@@ -83,6 +88,17 @@ var brdragbarright = brg.append("rect")
       .attr("fill-opacity", .8)
       .attr("cursor", "ew-resize")
       .call(brdragright);
+
+var brdragbarleft = brg.append("rect")
+      .attr("x", function(d) { return d.x - (brdragbarw / 2); })
+      .attr("y", function(d) { return d.y + (dragbarw/2); })
+      .attr("id", "brdragright")
+      .attr("height", brheight - brdragbarw)
+      .attr("width", brdragbarw)
+      .attr("fill", "blue")
+      .attr("fill-opacity", .8)
+      .attr("cursor", "ew-resize")
+      .call(brdragleft);
 
 // rectangle
 var dragrect = newg.append("rect")
@@ -146,30 +162,48 @@ var dragbarbottom = newg.append("rect")
  */
 // back rectangle
 function brdragmove(d) {
-  if (isXChecked) {
       brdragrect
-          .attr("x", d.x = Math.max(0, Math.min(w - brwidth, d3.event.x)))
-  }
+          .attr("x", d.x = Math.max(0, Math.min(w - brwidth, d3.event.x)));
+    
+      brdragbarleft
+          .attr("x", function(d) { return d.x - (brdragbarw / 2); })
+    
+      brdragbarright
+          .attr("x", function(d) { return d.x + brwidth - (brdragbarw / 2); })
+}
+
+function brldragresize(d) {
+    var oldx = d.x; 
+    //Max x on the right is x + width - dragbarw
+    //Max x on the left is 0 - (dragbarw/2)
+    d.x = Math.max(0, Math.min(d.x + brwidth - (brdragbarw / 2), d3.event.x)); 
+    
+    brwidth = brwidth + (oldx - d.x);
+
+    brdragbarleft
+        .attr("x", function(d) { return d.x - (brdragbarw / 2); });
+
+    brdragrect
+        .attr("x", function(d) { return d.x; })
+        .attr("width", brwidth);   
 }
 
 function brrdragresize(d) {
-   if (isXChecked) {
-     //Max x on the left is x - width 
-     //Max x on the right is width of screen + (dragbarw/2)
-     var dragx = Math.max(d.x + (brdragbarw/2), Math.min(w, d.x + brwidth + d3.event.dx));
+    //Max x on the left is x - width 
+    //Max x on the right is width of screen + (dragbarw/2)
+    var dragx = Math.max(d.x + (brdragbarw/2), Math.min(w, d.x + brwidth + d3.event.dx));
 
-     //recalculate width
-     brwidth = dragx - d.x;
+    //recalculate width
+    brwidth = dragx - d.x;
 
-     //move the right drag handle
-     brdragbarright
-        .attr("x", function(d) { return dragx - (brdragbarw * 1.5) });
+    //move the right drag handle
+    brdragbarright
+        .attr("x", function(d) { return dragx - (brdragbarw / 2) });
 
-     //resize the drag rectangle
-     //as we are only resizing from the right, the x coordinate does not need to change
-     brdragrect
-        .attr("width", brwidth);     
-  }
+    //resize the drag rectangle
+    //as we are only resizing from the right, the x coordinate does not need to change
+    brdragrect
+        .attr("width", brwidth);    
 }
 
 // rectangle
