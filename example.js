@@ -1,3 +1,4 @@
+/* Not using these as we are not dragging along Y axis in this experiment. */
 $('#xChecked').click(function() {
     isXChecked = !isXChecked;
      dragbarleft 

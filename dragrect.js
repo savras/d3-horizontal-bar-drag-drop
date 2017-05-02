@@ -1,10 +1,30 @@
 // viewport
-var w = 750,
-    h = 350,
+var w = 1450,
+    h = 700,
     r = 120;
 
 var isXChecked = true,
     isYChecked = false;
+
+// data driven
+var data = [
+    {
+        xStart: 20,
+        xEnd: 320,
+        yStart: 20,
+        yEnd: 50,
+        brXStart: 70,
+        brXEnd: 520,
+        brYStart: 15,
+        brYEnd: 55,
+        
+        // back rectangle cannot be dragged past obstacle rectangle
+        obsXStart: 100,
+        obsXEnd: 150,
+        obsYStart: 15,
+        obsYEnd: 55
+    }
+]
 
 /**
  * Drag objects
@@ -66,9 +86,22 @@ var brg = svg.append("g")
 var newg = svg.append("g")
       .data([{x: ((width/2) + (brwidth - width)/2), y: (height/2) + (brheight - height)/2}]);
 
+var staticg = svg.append("g")
+      .data([{x: width + width/4, y: height / 2}]);
+
+// obstacle rectangle
+var obsrect = staticg.append("rect")
+    .attr("id", "obsRect")
+    .attr("x", function(d) { return d.x; })
+    .attr("y", function(d) { return d.y; })
+    .attr("height", data[0].obsYEnd - data[0].obsYStart)
+    .attr("width", data[0].obsXEnd - data[0].obsXStart)
+    .attr("fill", "red")
+    .attr("fill-opacity", .9)
+
 // back rectangle
 var brdragrect = brg.append("rect")
-    .attr("id", "engagementLevelRect")
+    .attr("id", "backRect")
     .attr("x", function(d) { return d.x; })
     .attr("y", function(d) { return d.y; })
     .attr("height", brheight)
