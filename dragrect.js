@@ -91,7 +91,18 @@ var ltooltip = d3.select("body").append("div")
 
 var svg = d3.select("body").append("svg")
     .attr("width", w)
-    .attr("height", h)
+    .attr("height", h);
+
+ svg.append("defs") // http://stackoverflow.com/questions/17776641/fill-rect-with-pattern?rq=1
+    .append("pattern")
+        .attr("id", "diagonalPatterns")
+        .attr("patternUnits", "userSpaceOnUse")
+        .attr("width", 4)
+        .attr("height", 4)
+    .append("path")
+        .attr('d', 'M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2')
+        .attr('stroke', '#000000')
+        .attr('stroke-width', 1);
 
 var brg = svg.append("g")
     .data([{x: width / 2, y: height / 2}]);
@@ -108,7 +119,8 @@ var brunderbar = brg.append("rect")
     .attr("x", function(d) { return d.x; })
     .attr("y", function(d) { return d.y + data[0].obsYEnd - data[0].obsYStart; })
     .attr("height", 5)
-    .attr("width", brwidth);
+    .attr("width", brwidth)
+    .attr("fill", "url(#diagonalPatterns)");
                           
 // obstacle rectangle
 var obsrect = staticg.append("rect")
