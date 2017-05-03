@@ -29,6 +29,17 @@ var data = [
 /**
  * Drag objects
  */
+// tooltip
+var tooltipDiv = d3.select("body").append("div")
+    .attr("id", "brltooltip")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
+var ltooltip = d3.select("body").append("div")
+    .attr("id", "ltooltip")
+    .attr("class", "tooltip")
+    .style("opacity", 0);
+
 // back reactangle (rectangle with lower z-index)
 var brwidth = 450,
     brheight = 40,
@@ -123,15 +134,25 @@ var brdragbarright = brg.append("rect")
       .call(brdragright);
 
 var brdragbarleft = brg.append("rect")
-      .attr("x", function(d) { return d.x - (brdragbarw / 2); })
-      .attr("y", function(d) { return d.y + (dragbarw/2); })
-      .attr("id", "brdragright")
-      .attr("height", brheight - brdragbarw)
-      .attr("width", brdragbarw)
-      .attr("fill", "blue")
-      .attr("fill-opacity", .8)
-      .attr("cursor", "ew-resize")
-      .call(brdragleft);
+        .attr("x", function(d) { return d.x - (brdragbarw / 2); })
+        .attr("y", function(d) { return d.y + (dragbarw/2); })
+        .attr("id", "brdragright")
+        .attr("height", brheight - brdragbarw)
+        .attr("width", brdragbarw)
+        .attr("fill", "blue")
+        .attr("fill-opacity", .8)
+        .attr("cursor", "ew-resize")
+        .call(brdragleft)
+        .on("mouseover", function(d) {  // tooltip
+            tooltipDiv.transition()
+                .duration(200)
+                .style("opacity", .9);
+        })
+        .on("mouseout", function(d) {
+            tooltipDiv.transition()
+                .duration(500)
+                .style("opacity", 0);
+        });
 
 // rectangle
 var dragrect = newg.append("rect")
@@ -146,15 +167,26 @@ var dragrect = newg.append("rect")
       .call(drag);
 
 var dragbarleft = newg.append("rect")
-      .attr("x", function(d) { return d.x - (dragbarw/2); })
-      .attr("y", function(d) { return d.y + (dragbarw/2); })
-      .attr("height", height - dragbarw)
-      .attr("id", "dragleft")
-      .attr("width", dragbarw)
-      .attr("fill", "purple")
-      .attr("fill-opacity", .8)
-      .attr("cursor", "ew-resize")
-      .call(dragleft);
+        .attr("x", function(d) { return d.x - (dragbarw/2); })
+        .attr("y", function(d) { return d.y + (dragbarw/2); })
+        .attr("height", height - dragbarw)
+        .attr("id", "dragleft")
+        .attr("width", dragbarw)
+        .attr("fill", "purple")
+        .attr("fill-opacity", .8)
+        .attr("cursor", "ew-resize")
+        .call(dragleft)
+        .on("mouseover", function(d) {  // tooltip
+            ltooltip.transition()
+            .duration(200)
+            .style("opacity", .9);
+        })
+        .on("mouseout", function(d) {
+            ltooltip.transition()
+            .duration(500)
+            .style("opacity", 0);
+        });
+        ;
 
 var dragbarright = newg.append("rect")
       .attr("x", function(d) { return d.x + width - (dragbarw/2); })
@@ -221,7 +253,11 @@ function brdragmove(d) {
 }
 
 function brldragresize(d) {
-    var oldx = d.x; 
+    var oldx = d.x;
+    
+    if(hasCollidedWithObstacle(oldx, d3.event.x)) {
+        return;
+    }    
     
     //Max x on the right is x + width - dragbarw
     //Max x on the left is 0 - (dragbarw/2)
@@ -234,7 +270,13 @@ function brldragresize(d) {
 
     brdragrect
         .attr("x", function(d) { return d.x; })
-        .attr("width", brwidth);   
+        .attr("width", brwidth);
+    
+
+    d3.select("#brltooltip")
+        .html(d.x)
+        .style("left", (d3.event.pageX) + "px")		
+        .style("top", (d3.event.pageY - 28) + "px");	
 }
 
 function brrdragresize(d) {
@@ -308,15 +350,15 @@ function ldragresize(d) {
     
     dragbarbottom 
         .attr("x", function(d) { return d.x + (dragbarw/2); })
-        .attr("width", width - dragbarw)  
+        .attr("width", width - dragbarw)
+    
+    d3.select("#ltooltip")
+        .html(d.x)
+        .style("left", (d3.event.pageX) + "px")		
+        .style("top", (d3.event.pageY - 28) + "px");	
 }
 
 function rdragresize(d) {
-    var currentHandleXPosition = this.getBoundingClientRect().left;
-    if(hasCollidedWithObstacle(currentHandleXPosition, d3.event.x + d.x)) {
-        return;
-    }
-    
     //Max x on the left is x - width 
     //Max x on the right is width of screen + (dragbarw/2)
     var dragx = Math.max(d.x + (dragbarw/2), Math.min(w, d.x + width + d3.event.dx));
