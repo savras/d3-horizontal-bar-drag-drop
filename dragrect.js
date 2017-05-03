@@ -29,17 +29,6 @@ var data = [
 /**
  * Drag objects
  */
-// tooltip
-var tooltipDiv = d3.select("body").append("div")
-    .attr("id", "brltooltip")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
-
-var ltooltip = d3.select("body").append("div")
-    .attr("id", "ltooltip")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
-
 // back reactangle (rectangle with lower z-index)
 var brwidth = 450,
     brheight = 40,
@@ -87,6 +76,19 @@ var dragbottom = d3.drag()
 /**
  * SVG shapes
  */
+// tooltip
+var tooltipDiv = d3.select("body").append("div")
+    .attr("id", "brltooltip")
+    .attr("class", "tooltip")
+    .style("left", function(d) { return (data[0].brXStart) + "px";})
+    .style("opacity", 0);
+
+var ltooltip = d3.select("body").append("div")
+    .attr("id", "ltooltip")
+    .attr("class", "tooltip")
+    .style("left", function(d) { return (data[0].xStart) + "px";})
+    .style("opacity", 0);
+
 var svg = d3.select("body").append("svg")
     .attr("width", w)
     .attr("height", h)
@@ -147,6 +149,9 @@ var brdragbarleft = brg.append("rect")
             tooltipDiv.transition()
                 .duration(200)
                 .style("opacity", .9);
+              
+            d3.select("#brltooltip")        
+                .html(data[0].brXStart);
         })
         .on("mouseout", function(d) {
             tooltipDiv.transition()
@@ -178,15 +183,17 @@ var dragbarleft = newg.append("rect")
         .call(dragleft)
         .on("mouseover", function(d) {  // tooltip
             ltooltip.transition()
-            .duration(200)
-            .style("opacity", .9);
+                .duration(200)
+                .style("opacity", .9);
+            
+            d3.select("#ltooltip")        
+                .html(data[0].xStart);
         })
         .on("mouseout", function(d) {
             ltooltip.transition()
-            .duration(500)
-            .style("opacity", 0);
+                .duration(500)
+                .style("opacity", 0);
         });
-        ;
 
 var dragbarright = newg.append("rect")
       .attr("x", function(d) { return d.x + width - (dragbarw/2); })
@@ -275,7 +282,7 @@ function brldragresize(d) {
 
     d3.select("#brltooltip")
         .html(d.x)
-        .style("left", (d3.event.pageX) + "px")		
+        .style("left", (d3.event.x) + "px")		
         .style("top", (d3.event.pageY - 28) + "px");	
 }
 
@@ -354,8 +361,8 @@ function ldragresize(d) {
     
     d3.select("#ltooltip")
         .html(d.x)
-        .style("left", (d3.event.pageX) + "px")		
-        .style("top", (d3.event.pageY - 28) + "px");	
+        .style("left", (d3.event.x) + "px")		
+        .style("top", (d3.event.pageY - 28) + "px");        
 }
 
 function rdragresize(d) {
