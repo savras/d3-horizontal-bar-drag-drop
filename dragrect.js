@@ -8,7 +8,7 @@ var isXChecked = true,
 
 // data driven
 var data = [
-    {
+    {        
         xStart: 200,
         xEnd: 530,
         yStart: 20,
@@ -102,6 +102,14 @@ var newg = svg.append("g")
 var staticg = svg.append("g")
       .data([{x: data[0].obsXStart, y: data[0].obsYStart}]);
 
+// bar underneadth the back rectangle
+var brunderbar = brg.append("rect")    
+    .attr("id", "brunderbar")
+    .attr("x", function(d) { return d.x; })
+    .attr("y", function(d) { return d.y + data[0].obsYEnd - data[0].obsYStart; })
+    .attr("height", 5)
+    .attr("width", brwidth);
+                          
 // obstacle rectangle
 var obsrect = staticg.append("rect")
     .attr("id", "obsRect")
@@ -275,6 +283,10 @@ function brldragresize(d) {
     brdragbarleft
         .attr("x", function(d) { return d.x - (brdragbarw / 2); });
 
+    brunderbar
+        .attr("x", function(d) { return d.x; })
+        .attr("width", brwidth);
+    
     brdragrect
         .attr("x", function(d) { return d.x; })
         .attr("width", brwidth);
@@ -298,6 +310,9 @@ function brrdragresize(d) {
     brdragbarright
         .attr("x", function(d) { return dragx - (brdragbarw / 2) });
 
+    brunderbar
+        .attr("width", brwidth);
+    
     //resize the drag rectangle
     //as we are only resizing from the right, the x coordinate does not need to change
     brdragrect
