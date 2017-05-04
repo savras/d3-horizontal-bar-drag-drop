@@ -42,7 +42,7 @@ var data = [
         }
     },
     {   
-        text: "two",
+        text: "Two",
         data: {            
             xStart: 200,
             xEnd: 530,
@@ -138,14 +138,6 @@ function createSvg(d) {
         .subject(Object)
         .on("drag", ldragresize);
 
-//    var dragtop = d3.drag()
-//        .subject(Object)
-//        .on("drag", tdragresize);
-//
-//    var dragbottom = d3.drag()
-//        .subject(Object)
-//        .on("drag", bdragresize);
-    
     /**
      * SVG shapes
      */
@@ -290,29 +282,6 @@ function createSvg(d) {
           .attr("cursor", "ew-resize")
           .call(dragright);
 
-
-//    var dragbartop = newg.append("rect")
-//          .attr("x", function(d) { return d.x + (dragbarw/2); })
-//          .attr("y", function(d) { return d.y - (dragbarw/2); })
-//          .attr("height", dragbarw)
-//          .attr("id", "dragleft")
-//          .attr("width", width - dragbarw)
-//          .attr("fill", "lightgreen")
-//          .attr("fill-opacity", .0)
-//          .attr("cursor", "ns-resize")
-//          .call(dragtop);
-//
-//    var dragbarbottom = newg.append("rect")
-//          .attr("x", function(d) { return d.x + (dragbarw/2); })
-//          .attr("y", function(d) { return d.y + height - (dragbarw/2); })
-//          .attr("id", "dragright")
-//          .attr("height", dragbarw)
-//          .attr("width", width - dragbarw)
-//          .attr("fill", "lightgreen")
-//          .attr("fill-opacity", .0)
-//          .attr("cursor", "ns-resize")
-//          .call(dragbottom);
-
     // obstacle rectangle
     var obsrect = newg.append("rect")
         .attr("id", "obsRect")
@@ -409,7 +378,6 @@ function createSvg(d) {
 
     // rectangle
     function dragmove() {
-      if (isXChecked) {
           dragrect
               .attr("x", d.x = Math.max(0, Math.min(w - width, d3.event.x)))
           dragbarleft 
@@ -420,19 +388,6 @@ function createSvg(d) {
               .attr("x", function(d) { return d.x + (dragbarw/2); })
           dragbarbottom 
               .attr("x", function(d) { return d.x + (dragbarw/2); })          
-      }
-      if (isYChecked) {
-          dragrect
-              .attr("y", d.y = Math.max(0, Math.min(h - height, d3.event.y)));
-          dragbarleft 
-              .attr("y", function(d) { return d.y + (dragbarw/2); });
-          dragbarright 
-              .attr("y", function(d) { return d.y + (dragbarw/2); });
-          dragbartop 
-              .attr("y", function(d) { return d.y - (dragbarw/2); });
-          dragbarbottom 
-              .attr("y", function(d) { return d.y + height - (dragbarw/2); });
-      }
     }
 
     function ldragresize() {   
@@ -453,14 +408,6 @@ function createSvg(d) {
         dragrect
             .attr("x", d.x)
             .attr("width", width);
-
-//        dragbartop 
-//            .attr("x", d.x + (dragbarw/2))
-//            .attr("width", width - dragbarw)
-//
-//        dragbarbottom 
-//            .attr("x", d.x + (dragbarw/2))
-//            .attr("width", width - dragbarw)
 
         d3.select("#ltooltip")
             .html(d.x)
