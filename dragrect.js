@@ -19,6 +19,8 @@ var data = [
     {   
         text: "One", 
         data: {
+            id: "One",
+            dataIndex: 0,
             xStart: 200,
             xEnd: 530,
             yStart: 20,
@@ -43,7 +45,9 @@ var data = [
     },
     {   
         text: "Two",
-        data: {            
+        data: {
+            id: "Two",
+            dataIndex: 1,
             xStart: 200,
             xEnd: 530,
             yStart: 20,
@@ -104,6 +108,7 @@ trows.selectAll("td")
 
 function createCheckbox(d) {
     var checkbox = d3.select("body").append("input")
+        .attr("id", "checkbox" + d)
         .attr("type", "checkbox")
         .remove();
     
@@ -143,6 +148,7 @@ function createSvg(d) {
      */
     // svg
     var svg = d3.select("body").append("svg")
+        .attr("id", "svg" + d.id)
         .attr("width", w)
         .attr("height", h)      
         .remove();
@@ -237,7 +243,7 @@ function createSvg(d) {
 
     // rectangle
     var dragrect = newg.append("rect")
-          .attr("id", "active")
+          .attr("id", "active" + d.id)
           .attr("x", d.x)
           .attr("y", d.y)
           .attr("height", height)
@@ -251,7 +257,7 @@ function createSvg(d) {
             .attr("x", d.x - (dragbarw/2))
             .attr("y", d.y + (dragbarw/2))
             .attr("height", height - dragbarw)
-            .attr("id", "dragleft")
+            .attr("id", "dragleft" + d.id)
             .attr("width", dragbarw)
             .attr("fill", "purple")
             .attr("fill-opacity", .8)
@@ -330,8 +336,8 @@ function createSvg(d) {
 
         if(hasCollidedWithObstacle(oldx, d3.event.x)) {
             return;
-        }    
-
+        }
+        
         //Max x on the right is x + width - dragbarw
         //Max x on the left is 0 - (dragbarw/2)
         d.brX = Math.max(0, Math.min(d.brX + brwidth - (brdragbarw / 2), d3.event.x)); 
@@ -397,11 +403,48 @@ function createSvg(d) {
             return;
         }    
 
+        // Drag multiple svgs together
+        var checkbox1 = document.getElementById("checkboxOne");
+        var checkbox2 = document.getElementById("checkboxTwo");
+        
+        var multidrag = false;
+        if(checkbox1.checked && checkbox2.checked) {
+            multidrag = true;
+//            if(data[0].xStart === data[1].xStart) {
+//                multidrag = true;
+//            }
+        }
+        
         //Max x on the right is x + width - dragbarw
         //Max x on the left is 0 - (dragbarw/2)
         d.x = Math.max(0, Math.min(d.x + width - (dragbarw / 2), d3.event.x)); 
         width = width + (oldx - d.x);
 
+        if(multidrag) {
+            if(this.id == "dragleftOne") {
+                var dragbarLeftTwo = d3.select("#dragleftTwo");
+                var dragrectTwo = d3.select("#activeTwo");
+                
+                dragbarLeftTwo
+                    .attr("x", d.x - (dragbarw / 2));
+                
+                dragrectTwo
+                    .attr("x", d.x)
+                    .attr("width", width);
+                
+            } else {
+                var dragbarLeftOne = d3.select("#dragleftOne");
+                var dragrectOne = d3.select("#activeOne");
+                
+                dragbarLeftOne
+                    .attr("x", d.x - (dragbarw / 2));
+                
+                dragrectOne
+                    .attr("x", d.x)
+                    .attr("width", width);                
+            }
+        }
+        
         dragbarleft
             .attr("x", d.x - (dragbarw / 2));
 
