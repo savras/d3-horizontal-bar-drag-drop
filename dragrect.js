@@ -70,11 +70,11 @@ var table = d3.select("body")
 
 var thead = table.append("thead");
 var tbody = table.append("tbody");
-var trow = tbody.append("tr");
 
-var tableBodyRows = trow.selectAll("td")
+var trows = tbody.selectAll("tr")
     .data(data)
     .enter()
+    .append("tr")
     .append("td")
     .append(function(d){
         return createSvg(d).node();
@@ -137,8 +137,7 @@ function createSvg(d) {
             .attr('stroke', '#000000')
             .attr('stroke-width', 1);
    
-    var newg = svg.append("g")
-        .data([data[0]]);
+    var newg = svg.append("g");
     
     // tooltip
     var tooltipDiv = d3.select("body").append("div")
@@ -156,14 +155,14 @@ function createSvg(d) {
         })
         .attr("id", "ltooltip")
         .attr("class", "tooltip")
-        .style("left", function(d) { return d.xStart + "px";})
+        .style("left", d.xStart + "px")
         .style("opacity", 0);
     
     // bar underneadth the back rectangle
     var brunderbar = newg.append("rect")    
         .attr("id", "brunderbar")
-        .attr("x", function(d) { return d.brX; })
-        .attr("y", function(d) { return d.brY + d.obsYEnd - d.obsYStart; })
+        .attr("x", d.brX)
+        .attr("y", d.brY + d.obsYEnd - d.obsYStart)
         .attr("height", 5)
         .attr("width", brwidth)
         .attr("fill", "url(#diagonalPatterns)");
@@ -171,8 +170,8 @@ function createSvg(d) {
     // back rectangle
     var brdragrect = newg.append("rect")
         .attr("id", "backRect")
-        .attr("x", function(d) { return d.brX; })
-        .attr("y", function(d) { return d.brY; })
+        .attr("x", d.brX)
+        .attr("y", d.brY)
         .attr("height", brheight)
         .attr("width", brwidth)
         .attr("fill", "orange")
@@ -181,8 +180,8 @@ function createSvg(d) {
         .call(brdrag);
 
     var brdragbarright = newg.append("rect")
-          .attr("x", function(d) { return d.brX + brwidth - (brdragbarw / 2); })
-          .attr("y", function(d) { return d.brY + (brdragbarw/2); })
+          .attr("x", d.brX + brwidth - (brdragbarw / 2))
+          .attr("y", d.brY + (brdragbarw/2))
           .attr("id", "brdragright")
           .attr("height", brheight - brdragbarw)
           .attr("width", brdragbarw)
@@ -192,8 +191,8 @@ function createSvg(d) {
           .call(brdragright);
 
     var brdragbarleft = newg.append("rect")
-            .attr("x", function(d) { return d.brX - (brdragbarw / 2); })
-            .attr("y", function(d) { return d.brY + (dragbarw/2); })
+            .attr("x", d.brX - (brdragbarw / 2))
+            .attr("y", d.brY + (dragbarw/2))
             .attr("id", "brdragright")
             .attr("height", brheight - brdragbarw)
             .attr("width", brdragbarw)
@@ -201,7 +200,7 @@ function createSvg(d) {
             .attr("fill-opacity", .8)
             .attr("cursor", "ew-resize")
             .call(brdragleft)
-            .on("mouseover", function(d) {  // tooltip
+            .on("mouseover", function() {  // tooltip
                 tooltipDiv.transition()
                     .duration(200)
                     .style("opacity", .9);
@@ -209,7 +208,7 @@ function createSvg(d) {
                 d3.select("#brltooltip")        
                     .html(d.brXStart);
             })
-            .on("mouseout", function(d) {
+            .on("mouseout", function() {
                 tooltipDiv.transition()
                     .duration(500)
                     .style("opacity", 0);
@@ -218,8 +217,8 @@ function createSvg(d) {
     // rectangle
     var dragrect = newg.append("rect")
           .attr("id", "active")
-          .attr("x", function(d) { return d.x; })
-          .attr("y", function(d) { return d.y; })
+          .attr("x", d.x)
+          .attr("y", d.y)
           .attr("height", height)
           .attr("width", width)
           .attr("fill", "seagreen")
@@ -228,8 +227,8 @@ function createSvg(d) {
           .call(drag);
 
     var dragbarleft = newg.append("rect")
-            .attr("x", function(d) { return d.x - (dragbarw/2); })
-            .attr("y", function(d) { return d.y + (dragbarw/2); })
+            .attr("x", d.x - (dragbarw/2))
+            .attr("y", d.y + (dragbarw/2))
             .attr("height", height - dragbarw)
             .attr("id", "dragleft")
             .attr("width", dragbarw)
@@ -237,7 +236,7 @@ function createSvg(d) {
             .attr("fill-opacity", .8)
             .attr("cursor", "ew-resize")
             .call(dragleft)
-            .on("mouseover", function(d) {  // tooltip
+            .on("mouseover", function() {  // tooltip
                 ltooltip.transition()
                     .duration(200)
                     .style("opacity", .9);
@@ -245,15 +244,15 @@ function createSvg(d) {
                 d3.select("#ltooltip")        
                     .html(d.xStart);
             })
-            .on("mouseout", function(d) {
+            .on("mouseout", function() {
                 ltooltip.transition()
                     .duration(500)
                     .style("opacity", 0);
             });
 
     var dragbarright = newg.append("rect")
-          .attr("x", function(d) { return d.x + width - (dragbarw/2); })
-          .attr("y", function(d) { return d.y + (dragbarw/2); })
+          .attr("x", d.x + width - (dragbarw/2))
+          .attr("y", d.y + (dragbarw/2))
           .attr("id", "dragright")
           .attr("height", height - dragbarw)
           .attr("width", dragbarw)
@@ -288,8 +287,8 @@ function createSvg(d) {
     // obstacle rectangle
     var obsrect = newg.append("rect")
         .attr("id", "obsRect")
-        .attr("x", function(d) { return d.obsX; })
-        .attr("y", function(d) { return d.obsY; })
+        .attr("x", d.obsX)
+        .attr("y", d.obsY)
         .attr("height", d.obsYEnd - d.obsYStart)
         .attr("width", d.obsXEnd - d.obsXStart)
         .attr("fill", "red")
@@ -316,7 +315,7 @@ function createSvg(d) {
     }
 
     // back rectangle
-    function brdragmove(d) {
+    function brdragmove() {
         return;
 //          brdragrect
 //              .attr("x", d.x = Math.max(0, Math.min(w - brwidth, d3.event.x)));
@@ -328,7 +327,7 @@ function createSvg(d) {
 //              .attr("x", function(d) { return d.x + brwidth - (brdragbarw / 2); })
     }
 
-    function brldragresize(d) {
+    function brldragresize() {
         var oldx = d.brX;
 
         if(hasCollidedWithObstacle(oldx, d3.event.x)) {
@@ -342,14 +341,14 @@ function createSvg(d) {
         brwidth = brwidth + (oldx - d.brX);
 
         brdragbarleft
-            .attr("x", function(d) { return d.brX - (brdragbarw / 2); });
+            .attr("x", d.brX - (brdragbarw / 2));
 
         brunderbar
-            .attr("x", function(d) { return d.brX; })
+            .attr("x", d.brX)
             .attr("width", brwidth);
 
         brdragrect
-            .attr("x", function(d) { return d.brX; })
+            .attr("x", d.brX)
             .attr("width", brwidth);
 
         d3.select("#brltooltip")
@@ -358,7 +357,7 @@ function createSvg(d) {
             .style("top", (d3.event.pageY - 28) + "px");	
     }
 
-    function brrdragresize(d) {
+    function brrdragresize() {
         //Max x on the left is x - width 
         //Max x on the right is width of screen + (dragbarw/2)
         var dragx = Math.max(d.brX + (brdragbarw/2), Math.min(w, d.brX + brwidth + d3.event.dx));
@@ -368,7 +367,7 @@ function createSvg(d) {
 
         //move the right drag handle
         brdragbarright
-            .attr("x", function(d) { return dragx - (brdragbarw / 2) });
+            .attr("x", dragx - (brdragbarw / 2));
 
         brunderbar
             .attr("width", brwidth);
@@ -380,7 +379,7 @@ function createSvg(d) {
     }
 
     // rectangle
-    function dragmove(d) {
+    function dragmove() {
       if (isXChecked) {
           dragrect
               .attr("x", d.x = Math.max(0, Math.min(w - width, d3.event.x)))
@@ -407,7 +406,7 @@ function createSvg(d) {
       }
     }
 
-    function ldragresize(d) {   
+    function ldragresize() {   
         var oldx = d.x; 
 
         if(hasCollidedWithObstacle(oldx, d3.event.x)) {
@@ -420,19 +419,19 @@ function createSvg(d) {
         width = width + (oldx - d.x);
 
         dragbarleft
-            .attr("x", function(d) { return d.x - (dragbarw / 2); });
+            .attr("x", d.x - (dragbarw / 2));
 
         dragrect
-            .attr("x", function(d) { return d.x; })
+            .attr("x", d.x)
             .attr("width", width);
 
-        dragbartop 
-            .attr("x", function(d) { return d.x + (dragbarw/2); })
-            .attr("width", width - dragbarw)
-
-        dragbarbottom 
-            .attr("x", function(d) { return d.x + (dragbarw/2); })
-            .attr("width", width - dragbarw)
+//        dragbartop 
+//            .attr("x", d.x + (dragbarw/2))
+//            .attr("width", width - dragbarw)
+//
+//        dragbarbottom 
+//            .attr("x", d.x + (dragbarw/2))
+//            .attr("width", width - dragbarw)
 
         d3.select("#ltooltip")
             .html(d.x)
@@ -440,7 +439,7 @@ function createSvg(d) {
             .style("top", (d3.event.pageY - 28) + "px");        
     }
 
-    function rdragresize(d) {
+    function rdragresize() {
         //Max x on the left is x - width 
         //Max x on the right is width of screen + (dragbarw/2)
         var dragx = Math.max(d.x + (dragbarw/2), Math.min(w, d.x + width + d3.event.dx));
@@ -450,15 +449,11 @@ function createSvg(d) {
 
         //move the right drag handle
         dragbarright
-            .attr("x", function(d) { return dragx - (dragbarw/2) });
+            .attr("x", dragx - (dragbarw/2));
 
         //resize the drag rectangle
         //as we are only resizing from the right, the x coordinate does not need to change
         dragrect
-            .attr("width", width);
-        dragbartop 
-            .attr("width", width - dragbarw)
-        dragbarbottom 
-            .attr("width", width - dragbarw)
+            .attr("width", width);  
     }   
 }
