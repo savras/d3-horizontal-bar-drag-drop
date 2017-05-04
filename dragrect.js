@@ -147,6 +147,7 @@ function createSvg(d) {
      * SVG shapes
      */
     // svg
+    //var div = d3.select("body").append("div");
     var svg = d3.select("body").append("svg")
         .attr("id", "svg" + d.id)
         .attr("width", w)
@@ -168,21 +169,25 @@ function createSvg(d) {
     
     // tooltip
     var tooltipDiv = d3.select("body").append("div")
-        .data({
-            brXStart: d.brXStart,
-        })
+        .data([{
+            x: d.brXStart,
+            y: d.brYStart,
+        }])
         .attr("id", "brltooltip")
         .attr("class", "tooltip")
-        .style("left", function(d) { return d.brXStart + "px";})
+        .style("left", function(d) { return d.x + "px"; })
+        .style("top", function(d) { return d.y + "px"; })
         .style("opacity", 0);
 
     var ltooltip = d3.select("body").append("div")
-        .data({
-            xStart: d.xStart
-        })
+        .data([{
+            x: d.xStart,
+            y: d.yStart
+        }])
         .attr("id", "ltooltip")
         .attr("class", "tooltip")
-        .style("left", d.xStart + "px")
+        .style("left", d.x + "px")
+        .style("top", function(d) { return d.y + "px"; })
         .style("opacity", 0);
     
     // bar underneadth the back rectangle
@@ -229,7 +234,7 @@ function createSvg(d) {
             .call(brdragleft)
             .on("mouseover", function() {  // tooltip
                 tooltipDiv.transition()
-                    .duration(200)
+                    .duration(150)
                     .style("opacity", .9);
 
                 d3.select("#brltooltip")        
@@ -237,7 +242,7 @@ function createSvg(d) {
             })
             .on("mouseout", function() {
                 tooltipDiv.transition()
-                    .duration(500)
+                    .duration(350)
                     .style("opacity", 0);
             });
 
