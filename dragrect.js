@@ -1,6 +1,6 @@
 // viewport
-var w = 1250,
-    h = 500,
+var w = 750,
+    h = 150,
     r = 120;
 
 // back reactangle (rectangle with lower z-index)
@@ -15,7 +15,6 @@ var width = 300,
     dragbarw = 10;
 
 // data driven thus:
-var yOffset = 150;
 var data = [
     {        
         xStart: 200,
@@ -31,7 +30,7 @@ var data = [
         brYStart: 15,
         brYEnd: 55,
         
-        // drag handles  cannot be horizontally dragged past obstacle rectangle
+        // drag handles cannot be horizontally dragged past obstacle rectangle
         obsX: 290,
         obsY: 15,
         obsXStart: 290,
@@ -42,24 +41,22 @@ var data = [
     {        
         xStart: 200,
         xEnd: 530,
-        yStart: 20 + yOffset,
-        yEnd: 50 + yOffset,
+        yStart: 20,
+        yEnd: 50,
         x: width/2 + (brwidth - width)/2,
-        y: height/2 + (brheight - height)/2 + yOffset,
+        y: height/2 + (brheight - height)/2,
         brX: width / 2, 
-        brY: height / 2 + yOffset,
+        brY: height / 2,
         brXStart: 150,
-        brXEnd: 600,
-        brYStart: 15 + yOffset,
-        brYEnd: 55 + yOffset,
-        
-        // drag handles  cannot be horizontally dragged past obstacle rectangle
-        obsX: 290,
-        obsY: 15 + yOffset,
-        obsXStart: 290,
-        obsXEnd: 330,
-        obsYStart: 15 + yOffset,
-        obsYEnd: 55 + yOffset
+        brXEnd: 650,
+        brYStart: 15,
+        brYEnd: 55,
+        obsX: 390,
+        obsY: 15,
+        obsXStart: 390,
+        obsXEnd: 430,
+        obsYStart: 15,
+        obsYEnd: 55
     }
 ]
 
@@ -164,7 +161,7 @@ function createSvg(d) {
         .attr("x", d.brX)
         .attr("y", d.brY + d.obsYEnd - d.obsYStart)
         .attr("height", 5)
-        .attr("width", brwidth)
+        .attr("width", d.brXEnd - d.brXStart)
         .attr("fill", "url(#diagonalPatterns)");
 
     // back rectangle
@@ -173,14 +170,14 @@ function createSvg(d) {
         .attr("x", d.brX)
         .attr("y", d.brY)
         .attr("height", brheight)
-        .attr("width", brwidth)
+        .attr("width", d.brXEnd - d.brXStart)
         .attr("fill", "orange")
         .attr("fill-opacity", .8)
         .attr("cursor", "move")
         .call(brdrag);
 
     var brdragbarright = newg.append("rect")
-          .attr("x", d.brX + brwidth - (brdragbarw / 2))
+          .attr("x", d.brX + d.brXEnd - d.brXStart - (brdragbarw / 2))
           .attr("y", d.brY + (brdragbarw/2))
           .attr("id", "brdragright")
           .attr("height", brheight - brdragbarw)
