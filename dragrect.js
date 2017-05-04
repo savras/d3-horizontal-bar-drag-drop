@@ -290,7 +290,7 @@ function createSvg(d) {
 
     // obstacle rectangle
     var obsrect = newg.append("rect")
-        .attr("id", "obsRect")
+        .attr("id", "obsRect" + d.id)
         .attr("x", d.obsX)
         .attr("y", d.obsY)
         .attr("height", d.obsYEnd - d.obsYStart)
@@ -303,12 +303,12 @@ function createSvg(d) {
     /**
      * drag behaviours
      */
-    function hasCollidedWithObstacle(oldx, currentDragXPos) {
+    function hasCollidedWithObstacle(oldx, currentDragXPos, dragBarrierFromLeft) {
         var stopDrag = false;
         var isCursorLeftOfObstable = oldx <= d.obsXStart;
         var isCursorRightOfObstable = oldx >= d.obsXEnd;
 
-        if(isCursorLeftOfObstable && currentDragXPos >= d.obsXStart) {
+        if(isCursorLeftOfObstable && currentDragXPos >= dragBarrierFromLeft) {
             return stopDrag = true;
         }
 
@@ -399,9 +399,6 @@ function createSvg(d) {
     function ldragresize() {   
         var oldx = d.x; 
 
-        if(hasCollidedWithObstacle(oldx, d3.event.x)) {
-            return;
-        }    
 
         // Drag multiple svgs together
         var checkbox1 = document.getElementById("checkboxOne");
@@ -415,11 +412,23 @@ function createSvg(d) {
 //            }
         }
         
+        var dragBarrierFromLeft = d.obsXStart;
+        if(multidrag){
+            var obsRectOne = document.getElementById("obsRectOne");
+            var obsRectTwo = document.getElementById("obsRectTwo");
+            dragBarrierFromLeft = Math.min(obsRectOne.x.baseVal.value, obsRectTwo.x.baseVal.value);
+            
+        }
+        if(hasCollidedWithObstacle(oldx, d3.event.x, dragBarrierFromLeft)) {
+            return;
+        }    
+
+        
         //Max x on the right is x + width - dragbarw
         //Max x on the left is 0 - (dragbarw/2)
         d.x = Math.max(0, Math.min(d.x + width - (dragbarw / 2), d3.event.x)); 
         width = width + (oldx - d.x);
-
+        
         if(multidrag) {
             if(this.id == "dragleftOne") {
                 var dragbarLeftTwo = d3.select("#dragleftTwo");
