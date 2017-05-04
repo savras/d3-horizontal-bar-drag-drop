@@ -16,47 +16,53 @@ var width = 300,
 
 // data driven thus:
 var data = [
-    {        
-        xStart: 200,
-        xEnd: 530,
-        yStart: 20,
-        yEnd: 50,
-        x: width/2 + (brwidth - width)/2,
-        y: height/2 + (brheight - height)/2,
-        brX: width / 2, 
-        brY: height / 2,
-        brXStart: 150,
-        brXEnd: 600,
-        brYStart: 15,
-        brYEnd: 55,
-        
-        // drag handles cannot be horizontally dragged past obstacle rectangle
-        obsX: 290,
-        obsY: 15,
-        obsXStart: 290,
-        obsXEnd: 330,
-        obsYStart: 15,
-        obsYEnd: 55
+    {   
+        text: "One", 
+        data: {
+            xStart: 200,
+            xEnd: 530,
+            yStart: 20,
+            yEnd: 50,
+            x: width/2 + (brwidth - width)/2,
+            y: height/2 + (brheight - height)/2,
+            brX: width / 2, 
+            brY: height / 2,
+            brXStart: 150,
+            brXEnd: 600,
+            brYStart: 15,
+            brYEnd: 55,
+
+            // drag handles cannot be horizontally dragged past obstacle rectangle
+            obsX: 290,
+            obsY: 15,
+            obsXStart: 290,
+            obsXEnd: 330,
+            obsYStart: 15,
+            obsYEnd: 55
+        }
     },
-    {        
-        xStart: 200,
-        xEnd: 530,
-        yStart: 20,
-        yEnd: 50,
-        x: width/2 + (brwidth - width)/2,
-        y: height/2 + (brheight - height)/2,
-        brX: width / 2, 
-        brY: height / 2,
-        brXStart: 150,
-        brXEnd: 650,
-        brYStart: 15,
-        brYEnd: 55,
-        obsX: 390,
-        obsY: 15,
-        obsXStart: 390,
-        obsXEnd: 430,
-        obsYStart: 15,
-        obsYEnd: 55
+    {   
+        text: "two",
+        data: {            
+            xStart: 200,
+            xEnd: 530,
+            yStart: 20,
+            yEnd: 50,
+            x: width/2 + (brwidth - width)/2,
+            y: height/2 + (brheight - height)/2,
+            brX: width / 2, 
+            brY: height / 2,
+            brXStart: 150,
+            brXEnd: 650,
+            brYStart: 15,
+            brYEnd: 55,
+            obsX: 390,
+            obsY: 15,
+            obsXStart: 390,
+            obsXEnd: 430,
+            obsYStart: 15,
+            obsYEnd: 55
+        }
     }
 ]
 
@@ -65,18 +71,44 @@ var table = d3.select("body")
     .append("table")
     .attr("id", "table");
 
-var thead = table.append("thead");
-var tbody = table.append("tbody");
+var thead = table.append("thead").append("tr");
+thead.selectAll("th")
+    .data(data)
+    .enter()
+    .append("th")
+    .text(function(d) {
+        return d.text;
+    });
 
+var tbody = table.append("tbody");
 var trows = tbody.selectAll("tr")
     .data(data)
     .enter()
-    .append("tr")
+    .append("tr");
+
+trows.selectAll("td")
+    .data(function(d) {
+        return [d.text, d.data];
+    })
+    .enter()
     .append("td")
-    .append(function(d){
-        return createSvg(d).node();
+    .append(function(d, i) {
+        if(i === 0) {
+            return createCheckbox(d).node();
+        } else {
+            return createSvg(d).node();
+        }
     });
+
 // end table
+
+function createCheckbox(d) {
+    var checkbox = d3.select("body").append("input")
+        .attr("type", "checkbox")
+        .remove();
+    
+    return checkbox;
+}
 
 function createSvg(d) {
     /**
